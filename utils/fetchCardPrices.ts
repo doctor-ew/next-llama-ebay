@@ -1,5 +1,6 @@
 import { getOAuthToken } from "@/utils/getEbayOAuthToken";
 import axios from "axios";
+import { Document, VectorStoreIndex } from "llamaindex"; // Import LlamaIndex
 
 interface AxiosError extends Error {
   response?: {
@@ -10,14 +11,13 @@ interface AxiosError extends Error {
 interface EbayItem {
   title: string;
   price: {
-    currency: string;
     value: string;
+    currency: string;
   };
 }
 
 export async function fetchCardPrices(query: string): Promise<EbayItem[]> {
-  const accessToken = await getOAuthToken();
-  console.log('[-oo-]', accessToken)// Get the dynamic OAuth token
+  const accessToken = await getOAuthToken(); // Get the dynamic OAuth token
   const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(query)}&limit=10`;
   const headers = {
     Authorization: `Bearer ${accessToken}`,
@@ -39,6 +39,27 @@ export async function fetchCardPrices(query: string): Promise<EbayItem[]> {
     }));
 
     console.log("Parsed items:", items);
+
+    // Convert the fetched data to a single document for LlamaIndex
+    const combinedText = items
+      .map(
+        (item: { title: any; price: { value: any; currency: any } }) =>
+          `${item.title}: ${item.price.value} ${item.price.currency}`,
+      )
+      .join("\n");
+    const document = new Document({ text: combinedText });
+
+    // Create embeddings and store them in a VectorStoreIndex
+    const index = await VectorStoreIndex.fromDocuments([document]);
+
+    // Query the index
+    const queryEngine = index.asQueryEngine();
+    const responseText = await queryEngine.query({
+      query: "What is the most expensive baseball card?",
+    });
+
+    console.log("RAG Query Response:", responseText.toString());
+
     return items;
   } catch (error) {
     const axiosError = error as AxiosError;

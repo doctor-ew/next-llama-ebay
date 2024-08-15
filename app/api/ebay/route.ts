@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchCardPrices } from '@/utils/ebay';
+import { fetchCardPrices } from '@/utils/fetchCardPrices';
 
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
