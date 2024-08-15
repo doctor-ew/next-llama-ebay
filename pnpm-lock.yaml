@@ -29,6 +29,9 @@ dependencies:
   '@traceloop/node-server-sdk':
     specifier: ^0.5.19
     version: 0.5.29(@opentelemetry/api@1.8.0)
+  '@types/ebay-oauth-nodejs-client':
+    specifier: ^1.2.4
+    version: 1.2.4
   ai:
     specifier: ^3.0.21
     version: 3.3.7(react@18.3.1)(svelte@4.2.18)(vue@3.4.37)(zod@3.23.8)
@@ -47,6 +50,9 @@ dependencies:
   duck-duck-scrape:
     specifier: ^2.2.5
     version: 2.2.5
+  ebay-oauth-nodejs-client:
+    specifier: ^1.2.2
+    version: 1.2.2
   formdata-node:
     specifier: ^6.0.3
     version: 6.0.3
@@ -3371,6 +3377,10 @@ packages:
     resolution: {integrity: sha512-xFdR6tkm0MWvBfO8xXCSsinYxHcqkQUlcHeSpMC2ukzOb6lwQAfDmW+Qt0AvlGd8HpsS28qKsB+oPeJn9I39jg==}
     dev: false
 
+  /@types/ebay-oauth-nodejs-client@1.2.4:
+    resolution: {integrity: sha512-v2ABjemtKhFpe6x4+8rxqoo6N4cg/vrBXeXWh6Ru+jRU0UqqygxzZdqxuvF6zy3A9l8L5qRQC09X+3vcu9KTSA==}
+    dev: false
+
   /@types/eslint-scope@3.7.7:
     resolution: {integrity: sha512-MzMFlSLBqNF2gcHWO0G1vP/YQyfvrxZ0bF+u7mzUdZ1/xK4A4sru+nraZz5i3iEIk1l1uyicaDVTB4QbbEkAYg==}
     dependencies:
@@ -5035,6 +5045,12 @@ packages:
   /eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
     dev: true
+
+  /ebay-oauth-nodejs-client@1.2.2:
+    resolution: {integrity: sha512-loTlaN0tgmB4W9jVKUMJC8TjIs4OZ6U/ktjI1ctJQKCZi3qAWkwt26sUtMkWCGaZbJgjZhNMoUi2bEvVGdGc/w==}
+    dependencies:
+      querystring: 0.2.1
+    dev: false
 
   /ecdsa-sig-formatter@1.0.11:
     resolution: {integrity: sha512-nagl3RYrbNv6kQkeJIpt6NJZy8twLB/2vtz6yN9Z4vRKHN4/QZJIEbqohALSgwKdnksuY3k5Addp5lg8sVoVcQ==}
@@ -8699,6 +8715,12 @@ packages:
     engines: {node: '>=0.6'}
     dependencies:
       side-channel: 1.0.6
+    dev: false
+
+  /querystring@0.2.1:
+    resolution: {integrity: sha512-wkvS7mL/JMugcup3/rMitHmd9ecIGd2lhFhK9N3UUQ450h66d1r3Y9nvXzQAW1Lq+wyx61k/1pfKS5KuKiyEbg==}
+    engines: {node: '>=0.4.x'}
+    deprecated: The querystring API is considered Legacy. new code should use the URLSearchParams API instead.
     dev: false
 
   /querystringify@2.2.0:
