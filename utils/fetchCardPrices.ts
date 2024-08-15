@@ -1,6 +1,12 @@
 import { getOAuthToken } from "@/utils/getEbayOAuthToken";
 import axios from "axios";
-import { Document, VectorStoreIndex } from "llamaindex"; // Import LlamaIndex
+import {
+  Document,
+  VectorStoreIndex,
+  ResponseSynthesizer,
+  TreeSummarize,
+  TreeSummarizePrompt,
+} from "llamaindex";
 
 interface AxiosError extends Error {
   response?: {
@@ -16,22 +22,60 @@ interface EbayItem {
   };
 }
 
+// Create a summarization prompt
+const treeSummarizePrompt: TreeSummarizePrompt = ({ context, query }) => {
+  return `Context information is provided below.
+---------------------
+${context}
+---------------------
+Based on this information, what is the main subject of the following query?
+Query: ${query}
+Subject:`;
+};
+
+async function extractSearchTerm(query: string): Promise<string> {
+  const document = new Document({ text: query });
+  const index = await VectorStoreIndex.fromDocuments([document]);
+
+  const responseSynthesizer = new ResponseSynthesizer({
+    responseBuilder: new TreeSummarize(),
+  });
+
+  const queryEngine = index.asQueryEngine({
+    responseSynthesizer,
+  });
+
+  queryEngine.updatePrompts({
+    "responseSynthesizer:summaryTemplate": treeSummarizePrompt,
+  });
+
+  // Correctly pass an object to the query method
+  const response = await queryEngine.query({ query });
+
+  const searchTerm = response.response.trim();
+  console.log("Extracted Search Term:", searchTerm);
+  return searchTerm;
+}
+
 export async function fetchCardPrices(query: string): Promise<EbayItem[]> {
-  const accessToken = await getOAuthToken(); // Get the dynamic OAuth token
-  const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(query)}&limit=10`;
+  const accessToken = await getOAuthToken();
+  const searchTerm = await extractSearchTerm(query); // Use the extracted search term
+  const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(searchTerm)}&limit=10`;
   const headers = {
     Authorization: `Bearer ${accessToken}`,
     "Content-Type": "application/json",
   };
 
-  console.log(`Fetching card prices for query: "${query}" from eBay...`);
+  console.log(`Fetching card prices for query: "${searchTerm}" from eBay...`);
 
   try {
     const response = await axios.get(url, { headers });
-    console.log(
-      `Received response from eBay: ${response.status} ${response.statusText}`,
-    );
-    console.log(`Found ${response.data.itemSummaries.length} items.`);
+    console.log(`Received response from eBay: ${response.status} ${response.statusText}`);
+
+    if (!response.data.itemSummaries) {
+      console.log("No items found in the response.");
+      return [];
+    }
 
     const items = response.data.itemSummaries.map((item: any) => ({
       title: item.title,
@@ -39,26 +83,6 @@ export async function fetchCardPrices(query: string): Promise<EbayItem[]> {
     }));
 
     console.log("Parsed items:", items);
-
-    // Convert the fetched data to a single document for LlamaIndex
-    const combinedText = items
-      .map(
-        (item: { title: any; price: { value: any; currency: any } }) =>
-          `${item.title}: ${item.price.value} ${item.price.currency}`,
-      )
-      .join("\n");
-    const document = new Document({ text: combinedText });
-
-    // Create embeddings and store them in a VectorStoreIndex
-    const index = await VectorStoreIndex.fromDocuments([document]);
-
-    // Query the index
-    const queryEngine = index.asQueryEngine();
-    const responseText = await queryEngine.query({
-      query: "What is the most expensive baseball card?",
-    });
-
-    console.log("RAG Query Response:", responseText.toString());
 
     return items;
   } catch (error) {
