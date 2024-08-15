@@ -20,7 +20,6 @@ export async function getOAuthToken(): Promise<string | null> {
 
   try {
     const response = await authToken.getApplicationToken("PRODUCTION"); // or 'SANDBOX'
-    console.log("|-o-| Raw OAuth Token Response:", response, typeof response);
 
     let tokenData;
 
@@ -31,12 +30,8 @@ export async function getOAuthToken(): Promise<string | null> {
       tokenData = response;
     }
 
-    console.log("|-o-| Parsed Token Data:", tokenData);
-
     cachedToken = tokenData.access_token;
     tokenExpiration = Date.now() + tokenData.expires_in * 1000 - 60000; // Set expiration time
-
-    console.log("|-o-| Obtained OAuth token:", cachedToken);
 
     return cachedToken;
   } catch (error) {

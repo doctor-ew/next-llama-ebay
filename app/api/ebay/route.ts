@@ -1,14 +1,26 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { fetchCardPrices } from '@/utils/fetchCardPrices';
+import { fetchCardPrices } from "@/utils/fetchCardPrices";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
-    const { searchParams } = new URL(request.url);
-    const query = searchParams.get('query');
+export async function POST(request: NextRequest) {
+  try {
+    // Safely parse JSON request body
+    const jsonData = await request.json();
+    const query = jsonData?.query;
 
     if (!query) {
-        return NextResponse.json({ error: 'Invalid query parameter' }, { status: 400 });
+      return NextResponse.json(
+          { error: "Invalid query parameter" },
+          { status: 400 }
+      );
     }
 
     const items = await fetchCardPrices(query);
     return NextResponse.json(items);
+  } catch (error) {
+    console.error("Error in /api/ebay:", error);
+    return NextResponse.json(
+        { error: "Internal server error" },
+        { status: 500 }
+    );
+  }
 }
