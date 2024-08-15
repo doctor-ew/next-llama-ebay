@@ -1,11 +1,10 @@
-import { fetchCardPrices } from "@/utils/fetchCardPrices";
 import { NextRequest, NextResponse } from "next/server";
+import { fetchCardPrices } from "@/utils/fetchCardPrices";
+import { extractSearchTerm } from "@/utils/extractSearchTerm"; // Import the search term extractor
 
 export async function POST(request: NextRequest) {
   try {
-    // Safely parse JSON request body
-    const jsonData = await request.json();
-    const query = jsonData?.query;
+    const { query } = await request.json();
 
     if (!query) {
       return NextResponse.json(
@@ -14,7 +13,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const items = await fetchCardPrices(query);
+    // Use the extractSearchTerm function to refine the query
+    const refinedQuery = await extractSearchTerm(query);
+
+    // Fetch card prices based on the refined query
+    const items = await fetchCardPrices(refinedQuery);
     return NextResponse.json(items);
   } catch (error) {
     console.error("Error in /api/ebay:", error);

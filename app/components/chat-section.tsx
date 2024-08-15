@@ -5,6 +5,8 @@ import { ChatInput, ChatMessages } from "./ui/chat";
 import { useClientConfig } from "./ui/chat/hooks/use-config";
 import { Message } from "ai";
 
+
+
 interface AxiosError extends Error {
   response?: {
     data?: any;
@@ -26,7 +28,7 @@ export default function ChatSection() {
     const userMessage: Message = {
       id: `${Date.now()}`, // Unique ID based on current time
       role: "user",
-      content: input.trim()
+      content: input.trim(),
     };
     await appendMessage(userMessage);
 
@@ -50,7 +52,7 @@ export default function ChatSection() {
         assistantMessage = {
           id: `${Date.now() + 1}`, // Unique ID based on current time
           role: "assistant",
-          content: "No results found."
+          content: "No results found.",
         };
       } else {
         const formattedResponse = data
@@ -62,7 +64,7 @@ export default function ChatSection() {
         assistantMessage = {
           id: `${Date.now() + 2}`, // Unique ID based on current time
           role: "assistant",
-          content: formattedResponse
+          content: formattedResponse,
         };
       }
 
@@ -86,7 +88,9 @@ export default function ChatSection() {
   };
 
   // Helper function to append messages and return a promise with a string | null | undefined
-  const appendMessage = (message: Message | Omit<Message, "id">): Promise<string | null | undefined> => {
+  const appendMessage = (
+      message: Message | Omit<Message, "id">
+  ): Promise<string | null | undefined> => {
     return new Promise((resolve) => {
       setMessages((prevMessages) => [...prevMessages, message as Message]);
       resolve(null); // Return `null` to satisfy the expected return type

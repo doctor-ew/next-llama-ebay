@@ -1,6 +1,12 @@
 import { getOAuthToken } from "@/utils/getEbayOAuthToken";
 import axios from "axios";
-import { Document, VectorStoreIndex } from "llamaindex";
+import {
+  Document,
+  VectorStoreIndex,
+  ResponseSynthesizer,
+  TreeSummarize,
+  TreeSummarizePrompt,
+} from "llamaindex";
 
 interface AxiosError extends Error {
   response?: {
@@ -16,17 +22,44 @@ interface EbayItem {
   };
 }
 
-// Simple query extractor for demonstration purposes
-function extractSearchTerm(query: string): string {
-  if (query.toLowerCase().includes("expensive")) {
-    return "expensive baseball card";
-  }
-  return "baseball card";
+// Create a summarization prompt
+const treeSummarizePrompt: TreeSummarizePrompt = ({ context, query }) => {
+  return `Context information is provided below.
+---------------------
+${context}
+---------------------
+Based on this information, what is the main subject of the following query?
+Query: ${query}
+Subject:`;
+};
+
+async function extractSearchTerm(query: string): Promise<string> {
+  const document = new Document({ text: query });
+  const index = await VectorStoreIndex.fromDocuments([document]);
+
+  const responseSynthesizer = new ResponseSynthesizer({
+    responseBuilder: new TreeSummarize(),
+  });
+
+  const queryEngine = index.asQueryEngine({
+    responseSynthesizer,
+  });
+
+  queryEngine.updatePrompts({
+    "responseSynthesizer:summaryTemplate": treeSummarizePrompt,
+  });
+
+  // Correctly pass an object to the query method
+  const response = await queryEngine.query({ query });
+
+  const searchTerm = response.response.trim();
+  console.log("Extracted Search Term:", searchTerm);
+  return searchTerm;
 }
 
 export async function fetchCardPrices(query: string): Promise<EbayItem[]> {
   const accessToken = await getOAuthToken();
-  const searchTerm = extractSearchTerm(query); // Extract a simplified search term
+  const searchTerm = await extractSearchTerm(query); // Use the extracted search term
   const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(searchTerm)}&limit=10`;
   const headers = {
     Authorization: `Bearer ${accessToken}`,
