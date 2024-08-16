@@ -1,8 +1,11 @@
-export const runtime = "edge"
+// export const runtime = "edge"
 
 import { NextRequest, NextResponse } from "next/server";
 import { fetchCardPrices } from "@/utils/fetchCardPrices";
 import { extractSearchTerm } from "@/utils/extractSearchTerm"; // Import the search term extractor
+// import sharp from 'sharp';
+// import { someOnnxruntimeFunction } from 'onnxruntime-node';
+
 
 let https, fs, path;
 
