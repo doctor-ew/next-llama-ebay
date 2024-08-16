@@ -2,6 +2,15 @@ import { getOAuthToken } from "@/utils/getEbayOAuthToken";
 import axios from "axios";
 import { extractSearchTerm } from "@/utils/extractSearchTerm"; // Import the extraction function
 
+let fs, path;
+
+if (typeof window === 'undefined') {
+  fs = require('fs');
+  path = require('path');
+}
+
+
+
 interface AxiosError extends Error {
   response?: {
     data?: any;

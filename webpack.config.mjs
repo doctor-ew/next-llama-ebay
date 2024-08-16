@@ -1,5 +1,10 @@
 export default function webpack(config, isServer) {
-  // Only apply node-loader if you absolutely need it for .node files
+  config.resolve.fallback = {
+    https: false,
+    fs: false,
+    path: false,
+  };
+
   if (isServer) {
     config.module.rules.push({
       test: /\.node$/,
@@ -8,11 +13,6 @@ export default function webpack(config, isServer) {
 
     config.ignoreWarnings = [{ module: /opentelemetry/ }];
   }
-
-  // Resolve fallback for aws4 library
-  config.resolve.fallback = {
-    aws4: false,
-  };
 
   return config;
 }
