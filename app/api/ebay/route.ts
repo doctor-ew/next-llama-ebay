@@ -1,3 +1,5 @@
+export const config = { runtime: 'edge' };
+
 import { NextRequest, NextResponse } from "next/server";
 import { fetchCardPrices } from "@/utils/fetchCardPrices";
 import { extractSearchTerm } from "@/utils/extractSearchTerm"; // Import the search term extractor
