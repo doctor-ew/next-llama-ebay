@@ -5,8 +5,6 @@ import { ChatInput, ChatMessages } from "./ui/chat";
 import { useClientConfig } from "./ui/chat/hooks/use-config";
 import { Message } from "ai";
 
-
-
 interface AxiosError extends Error {
   response?: {
     data?: any;
@@ -48,23 +46,24 @@ export default function ChatSection() {
       const data = await response.json();
 
       let assistantMessage: Message;
-      if (!data || !data.length) {
+      if (!data.items || !data.items.length) {
         assistantMessage = {
           id: `${Date.now() + 1}`, // Unique ID based on current time
           role: "assistant",
           content: "No results found.",
         };
       } else {
-        const formattedResponse = data
+        const formattedResponse = data.items
             .map(
-                (item: any) =>
-                    `${item.title}: ${item.price.value} ${item.price.currency}`
+                (item: any, index: number) =>
+                    `${index + 1}. **[${item.title}](${item.url})**: ${item.price.value} ${item.price.currency}`
             )
             .join("\n");
+
         assistantMessage = {
           id: `${Date.now() + 2}`, // Unique ID based on current time
           role: "assistant",
-          content: formattedResponse,
+          content: `Here are some results:\n\n${formattedResponse}\n\n[Search on eBay](${data.url})`,
         };
       }
 

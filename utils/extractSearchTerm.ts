@@ -12,7 +12,7 @@ const treeSummarizePrompt: TreeSummarizePrompt = ({ context, query }) => {
 ---------------------
 ${context}
 ---------------------
-Given this information, extract the core subject of the following query in the simplest form, without adjectives or additional details. For example: 'What is the most expensive baseball card' would distill to 'baseball card' and 'what pokemon card is most valuable' would distill to 'pokemon card'. 'baseball card' is its most simple form :
+Given this information, extract the core subject of the following query in the simplest form, without adjectives or additional details. For example: 'What is the most expensive baseball card' would distill to 'baseball card' and 'what pokemon card is most valuable' would distill to 'pokemon card'. 'baseball card' is its most simple form. 'Mickey Mantle's rookie card' would be  'Mickey Mantle's rookie card' and 'Michael Jordan card' would be 'Michael Jordan card':
 Query: ${query}
 Subject:`;
 };
