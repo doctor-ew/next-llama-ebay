@@ -29,7 +29,7 @@ interface EbayItem {
 export async function fetchCardPrices(query: string): Promise<{ items: EbayItem[], url: string }> {
   const accessToken = await getOAuthToken();
   const searchTerm = await extractSearchTerm(query); // Use the refined search term
-  const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(searchTerm)}&limit=10`;
+  const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(searchTerm)}&filter=price:[999..10000]&sort=-price&limit=10`;
   const headers = {
     Authorization: `Bearer ${accessToken}`,
     "Content-Type": "application/json",
