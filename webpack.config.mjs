@@ -1,13 +1,18 @@
 export default function webpack(config, isServer) {
   config.resolve.fallback = {
-    aws4: false,
+    https: false,
+    fs: false,
+    path: false,
   };
-  config.module.rules.push({
-    test: /\.node$/,
-    loader: "node-loader",
-  });
+
   if (isServer) {
+    config.module.rules.push({
+      test: /\.node$/,
+      loader: "node-loader",
+    });
+
     config.ignoreWarnings = [{ module: /opentelemetry/ }];
   }
+
   return config;
 }

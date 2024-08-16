@@ -15,8 +15,8 @@ export default function Header() {
           <span>Built by LlamaIndex</span>
           <Image
             className="rounded-xl"
-            src="/llama.png"
-            alt="Llama Logo"
+            src="/doctorew.png"
+            alt="DoctorEw"
             width={40}
             height={40}
             priority
