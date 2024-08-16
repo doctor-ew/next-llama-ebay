@@ -1,71 +1,117 @@
 This is a [LlamaIndex](https://www.llamaindex.ai/) project using [Next.js](https://nextjs.org/) bootstrapped with [`create-llama`](https://github.com/run-llama/LlamaIndexTS/tree/main/packages/create-llama).
 
-## Getting Started
+# CardScraper
 
-First, install the dependencies:
+CardScraper is a Next.js application that integrates with the eBay API to scrape and display information about baseball cards. It utilizes the Next.js App Router, custom utility functions, and API routes to provide a seamless experience for users interested in tracking and analyzing baseball card prices. The application is designed to be deployed on Vercel, leveraging its edge functions and serverless capabilities for optimal performance.
 
-```
-npm install
-```
+## Features
 
-Second, generate the embeddings of the documents in the `./data` directory (if this folder exists - otherwise, skip this step):
+- **Next.js App Router**: The app uses the Next.js App Router to manage routes and render components dynamically.
+- **eBay API Integration**: Fetches data from the eBay API to retrieve real-time information about baseball cards.
+- **Custom Utility Functions**: Utility functions are used to handle tasks like extracting search terms and managing OAuth tokens.
+- **Vercel Deployment**: The application is designed to be easily deployed on Vercel, utilizing its serverless and edge function capabilities.
+- **Secure API Keys**: Requires an eBay API key to function, with secure handling of environment variables via Vercel's secret management.
 
-```
-npm run generate
-```
+## Prerequisites
 
-Third, run the development server:
+- **Node.js**: Make sure you have Node.js installed on your machine.
+- **Vercel Account**: For deployment and managing environment variables.
+- **eBay Developer Account**: You'll need to obtain an API key from the [eBay Developer Portal](https://developer.ebay.com/).
 
-```
-npm run dev
-```
+## Installation
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. **Clone the Repository**:   
+    ```
+    git clone https://github.com/doctor-ew/next-llama-ebay.git cd next-llama-ebay
+    ```
+    
+2. **Install Dependencies**:
+    
+    The project uses `pnpm` for package management. Install it if you haven't already, and then install the project dependencies:
+    
+    ```
+    pnpm install
+    ```
+    
+3. **Configure Environment Variables**:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+    Create a `.env.local` file in the root directory to store your eBay API key and any other environment-specific configurations:
+    
+    ```
+    EBAY_API_KEY=your_ebay_api_key_here
+    ```
+    
+    ***Make sure to also add this key as a secret in your Vercel project settings.***
+    
+4. **Run the Development Server**:
+    
+    Start the Next.js development server:
+    
+    ```
+    pnpm dev
+    ```
+    
+    The app will be available at `http://localhost:3000`.
+    
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Project Structure
 
-## Using Docker
+- **app/api/ebay/route.ts**: This is the primary API route that interacts with the eBay API. It utilizes the `fetchCardPrices.ts` utility to fetch data and `getEbayOAuthToken.ts` to handle OAuth authentication.
+    
+- **utils/**: This directory contains utility functions such as:
+    
+    - **extractSearchTerm.ts**: Extracts and refines search terms for better query results.
+    - **fetchCardPrices.ts**: Fetches card prices from eBay using the API.
+    - **getEbayOAuthToken.ts**: Handles OAuth token retrieval and management.
+- **pages/**: Contains the main application pages and layout configurations.
+    
+- **components/**: Houses React components for the user interface, such as buttons, chat sections, and input fields.
+    
+- **config/**: Contains configuration files like `tools.json` which can be extended for future needs.
+    
+- **public/**: Static files like images and icons are stored here.
+    
+- **next.config.mjs**: Configuration file for Next.js, including webpack customizations and integration with LlamaIndex for specific use cases.
+    
 
-1. Build an image for the Next.js app:
+## Deployment
 
-```
-docker build -t <your_app_image_name> .
-```
+The application is designed to be deployed on Vercel. Follow these steps to deploy:
 
-2. Generate embeddings:
+1. **Connect to Vercel**:
+    
+    You can connect your GitHub repository to Vercel directly, and it will automatically deploy when you push changes.
+    
+2. **Add Environment Variables**:
+    
+    Add your eBay API key and any other necessary environment variables to the Vercel project:
+    
+    - Go to the Vercel dashboard.
+    - Select your project.
+    - Navigate to the "Environment Variables" section.
+    - Add the `EBAY_API_KEY` variable.
+3. **Deploy**:
+    
+    Vercel will automatically detect your Next.js app and deploy it using serverless functions for API routes.
+    
+    After deployment, you can access your application via the Vercel-provided URL.
+    
 
-Parse the data and generate the vector embeddings if the `./data` folder exists - otherwise, skip this step:
+## Known Issues
 
-```
-docker run \
-  --rm \
-  -v $(pwd)/.env:/app/.env \ # Use ENV variables and configuration from your file-system
-  -v $(pwd)/config:/app/config \
-  -v $(pwd)/data:/app/data \
-  -v $(pwd)/cache:/app/cache \ # Use your file system to store the vector database
-  <your_app_image_name> \
-  npm run generate
-```
+- **Unsupported Modules on Edge Functions**: Due to limitations in Vercel Edge Functions, certain Node.js modules like `sharp` and `onnxruntime-node` are not supported. Ensure these are only used in serverless functions or replace them with alternatives.
+    
+- **Module Not Found Errors**: If you encounter "Module not found" errors during the build process, ensure that the required modules are installed and that they are being used in the correct environment (Edge vs. Serverless).
+    
 
-3. Start the app:
+## Contributing
 
-```
-docker run \
-  --rm \
-  -v $(pwd)/.env:/app/.env \ # Use ENV variables and configuration from your file-system
-  -v $(pwd)/config:/app/config \
-  -v $(pwd)/cache:/app/cache \ # Use your file system to store gea vector database
-  -p 3000:3000 \
-  <your_app_image_name>
-```
+Contributions are welcome! Please open an issue or submit a pull request with your enhancements.
 
-## Learn More
+## License
 
-To learn more about LlamaIndex, take a look at the following resources:
+This project is licensed under the MIT License.
 
-- [LlamaIndex Documentation](https://docs.llamaindex.ai) - learn about LlamaIndex (Python features).
-- [LlamaIndexTS Documentation](https://ts.llamaindex.ai) - learn about LlamaIndex (Typescript features).
+---
 
-You can check out [the LlamaIndexTS GitHub repository](https://github.com/run-llama/LlamaIndexTS) - your feedback and contributions are welcome!
+_README authored by Bob the GPT, your trusty coding copilot._
