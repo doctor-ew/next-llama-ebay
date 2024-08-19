@@ -29,10 +29,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Use the extractSearchTerm function to refine the query
-    const refinedQuery = await extractSearchTerm(query);
+    const { subject, intent } = await extractSearchTerm(query);
 
-    // Fetch card prices based on the refined query
-    const items = await fetchCardPrices(refinedQuery);
+    // Fetch card prices based on the refined subject and intent
+    const items = await fetchCardPrices(subject, intent);
     return NextResponse.json(items);
   } catch (error) {
     console.error("Error in /api/ebay:", error);
