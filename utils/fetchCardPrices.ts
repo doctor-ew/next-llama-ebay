@@ -1,15 +1,6 @@
 import { getOAuthToken } from "@/utils/getEbayOAuthToken";
 import axios from "axios";
-import { extractSearchTerm } from "@/utils/extractSearchTerm"; // Import the extraction function
-
-let fs, path;
-
-if (typeof window === 'undefined') {
-  fs = require('fs');
-  path = require('path');
-}
-
-
+import { extractSearchTerm } from "@/utils/extractSearchTerm";
 
 interface AxiosError extends Error {
   response?: {
@@ -26,16 +17,27 @@ interface EbayItem {
   url: string; // Include the URL to the seller's page
 }
 
-export async function fetchCardPrices(query: string): Promise<{ items: EbayItem[], url: string }> {
+export async function fetchCardPrices(subject: string, intent: string): Promise<{ items: EbayItem[], url: string }> {
   const accessToken = await getOAuthToken();
-  const searchTerm = await extractSearchTerm(query); // Use the refined search term
-  const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(searchTerm)}&filter=price:[999..10000]&sort=-price&limit=10`;
+
+  // The eBay API URL template
+  let url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(subject)}&limit=10`;
+
+  // Adjust query parameters dynamically based on the intent extracted by LlamaIndex
+  if (intent.includes("most expensive")) {
+    url += "&sort=-price";
+  } else if (intent.includes("cheapest")) {
+    url += "&sort=price";
+  } else if (intent.includes("best investment")) {
+    url += "&sort=price&filter=price:[50..1000]"; // Example filter for "best investment"
+  }
+
   const headers = {
     Authorization: `Bearer ${accessToken}`,
     "Content-Type": "application/json",
   };
 
-  console.log(`Fetching card prices for query: "${searchTerm}" from eBay...`);
+  console.log(`Fetching card prices for subject: "${subject}" with intent: "${intent}" from eBay...`);
 
   try {
     const response = await axios.get(url, { headers });
